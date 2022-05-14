@@ -27,7 +27,7 @@ typedef struct {
 }ORDERING;
 ORDERING ordering;
 
-//×Ö·û×ªÎª¿í×Ö·û
+//å­—ç¬¦è½¬ä¸ºå®½å­—ç¬¦
 wchar_t* trstring2wchar(const  char* str)
 {
 	int mystringsize = (int)(strlen(str) + 1);
@@ -37,7 +37,7 @@ wchar_t* trstring2wchar(const  char* str)
 
 }
 
-//¿í×Ö·û×ª»»Îª×Ö·û´®
+//å®½å­—ç¬¦è½¬æ¢ä¸ºå­—ç¬¦ä¸²
 void wchar2strstring(string& szDst, WCHAR* wchart)
 {
 	wchar_t* wtext = wchart;
@@ -49,7 +49,7 @@ void wchar2strstring(string& szDst, WCHAR* wchart)
 	delete[]psTest;
 }
 
-//×Ö·û×ª»»Îªwstring
+//å­—ç¬¦è½¬æ¢ä¸ºwstring
 wstring CharToWchar(const char* c, size_t m_encode = CP_ACP)
 {
 	std::wstring str;
@@ -62,26 +62,26 @@ wstring CharToWchar(const char* c, size_t m_encode = CP_ACP)
 	return str;
 }
 
-//¿í×Ö·û×ª×Ö·ûÖ¸Õë
+//å®½å­—ç¬¦è½¬å­—ç¬¦æŒ‡é’ˆ
 char* wideCharToMultiByte(wchar_t* pWCStrKey)
 {
-	//µÚÒ»´Îµ÷ÓÃÈ·ÈÏ×ª»»ºóµ¥×Ö½Ú×Ö·û´®µÄ³¤¶È£¬ÓÃÓÚ¿ª±Ù¿Õ¼ä
+	//ç¬¬ä¸€æ¬¡è°ƒç”¨ç¡®è®¤è½¬æ¢åå•å­—èŠ‚å­—ç¬¦ä¸²çš„é•¿åº¦ï¼Œç”¨äºå¼€è¾Ÿç©ºé—´
 	int pSize = WideCharToMultiByte(CP_OEMCP, 0, pWCStrKey, wcslen(pWCStrKey), NULL, 0, NULL, NULL);
 	char* pCStrKey = new char[pSize + 1];
-	//µÚ¶ş´Îµ÷ÓÃ½«Ë«×Ö½Ú×Ö·û´®×ª»»³Éµ¥×Ö½Ú×Ö·û´®
+	//ç¬¬äºŒæ¬¡è°ƒç”¨å°†åŒå­—èŠ‚å­—ç¬¦ä¸²è½¬æ¢æˆå•å­—èŠ‚å­—ç¬¦ä¸²
 	WideCharToMultiByte(CP_OEMCP, 0, pWCStrKey, wcslen(pWCStrKey), pCStrKey, pSize, NULL, NULL);
 	pCStrKey[pSize] = '\0';
 	return pCStrKey;
 }
 
-//´íÎó´¦Àí
+//é”™è¯¯å¤„ç†
 void handleResult(SQLHANDLE hHandle, SQLSMALLINT hType, RETCODE  RetCode)
 {
 	SQLSMALLINT iRec = 0;
 	SQLINTEGER iError;
 	WCHAR wszMessage[1000];
 	WCHAR wszState[SQL_SQLSTATE_SIZE + 1];
-	//´¦ÀíÎŞĞ§
+	//å¤„ç†æ— æ•ˆ
 	if (RetCode == SQL_INVALID_HANDLE)
 	{
 		fwprintf(stderr, L"Invalid handle!\n");
@@ -97,9 +97,9 @@ void handleResult(SQLHANDLE hHandle, SQLSMALLINT hType, RETCODE  RetCode)
 	}
 }
 
-//Êä³ö´íÎó
+//è¾“å‡ºé”™è¯¯
 void error(SQLRETURN err) {
-	cout<<"Ïà¹ØĞÅÏ¢Êä³ö£º "<<endl;
+	cout<<"ç›¸å…³ä¿¡æ¯è¾“å‡ºï¼š "<<endl;
 	switch (err) {
 	case	SQL_SUCCESS:puts("****SQL_SUCCESS*****"); break;
 	case	SQL_SUCCESS_WITH_INFO:puts("SQL_SUCCESS_WITH_INFO"); break;
@@ -111,13 +111,13 @@ void error(SQLRETURN err) {
 	}
 }
 
-//Á¬½Ó
+//è¿æ¥
 void Link() {
-	ret = SQLAllocHandle(SQL_HANDLE_ENV, NULL, &henv);//ÉêÇë»·¾³¾ä±ú
+	ret = SQLAllocHandle(SQL_HANDLE_ENV, NULL, &henv);//ç”³è¯·ç¯å¢ƒå¥æŸ„
 	ret = SQLSetEnvAttr(henv,SQL_ATTR_ODBC_VERSION,(SQLPOINTER)SQL_OV_ODBC3,SQL_IS_INTEGER);
-	ret = SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);//ÉêÇëÊı¾İ¿âÁ¬½Ó¾ä±ú
+	ret = SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);//ç”³è¯·æ•°æ®åº“è¿æ¥å¥æŸ„
 
-	ret = SQLConnect(hdbc, (SQLWCHAR*)L"TEST", SQL_NTS, (SQLWCHAR*)L"XYL", SQL_NTS, (SQLWCHAR*)L"xuyule010913@", SQL_NTS);
+	ret = SQLConnect(hdbc, (SQLWCHAR*)L"TEST", SQL_NTS, (SQLWCHAR*)L"UserName", SQL_NTS, (SQLWCHAR*)L"PassWord", SQL_NTS);
 
 	if (!(ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO)) {
 		cout << "Failed to connect to database!" << endl << endl;
@@ -127,15 +127,15 @@ void Link() {
 	}
 }
 
-//ÊÍ·Å¿Õ¼ä
+//é‡Šæ”¾ç©ºé—´
 void free()
 {
-	SQLFreeHandle(SQL_HANDLE_STMT, hstmt);//ÊÍ·ÅÓï¾ä
-	SQLFreeHandle(SQL_HANDLE_DBC, hdbc);//ÊÍ·ÅÁ¬½Ó
-	SQLFreeHandle(SQL_HANDLE_ENV, henv);//ÊÍ·Å»·¾³
+	SQLFreeHandle(SQL_HANDLE_STMT, hstmt);//é‡Šæ”¾è¯­å¥
+	SQLFreeHandle(SQL_HANDLE_DBC, hdbc);//é‡Šæ”¾è¿æ¥
+	SQLFreeHandle(SQL_HANDLE_ENV, henv);//é‡Šæ”¾ç¯å¢ƒ
 }
 
-//¶Ï¿ªÁ¬½Ó
+//æ–­å¼€è¿æ¥
 void Unlink() {
 	SQLDisconnect(hdbc);
 	SQLFreeHandle(SQL_HANDLE_DBC, hdbc);
@@ -143,7 +143,7 @@ void Unlink() {
 }
 
 
-//²éÑ¯
+//æŸ¥è¯¢
 void Action_Admin();
 void Action_Customer();
 
@@ -156,11 +156,11 @@ void Inquire_Admin() {
 	{
 		SQLCHAR str1[50], str2[50];
 		SQLLEN len_str1, len_str2;
-		/*SQLFetchº¯ÊıµÄ¹¦ÄÜÊÇ½«½á¹û¼¯µÄµ±Ç°¼ÇÂ¼Ö¸ÕëÒÆÖÁÏÂÒ»¸ö¼ÇÂ¼£»*/
+		/*SQLFetchå‡½æ•°çš„åŠŸèƒ½æ˜¯å°†ç»“æœé›†çš„å½“å‰è®°å½•æŒ‡é’ˆç§»è‡³ä¸‹ä¸€ä¸ªè®°å½•ï¼›*/
 		while (SQLFetch(hstmt) != SQL_NO_DATA)
 		{
-			/*SQLGetDataº¯ÊıµÄ¹¦ÄÜÊÇÌáÈ¡½á¹û¼¯ÖĞµ±Ç°¼ÇÂ¼µÄÄ³¸ö×Ö¶ÎÖµ*/
-			SQLGetData(hstmt, 1, SQL_C_CHAR, str1, sizeof(str1), &len_str1);   //»ñÈ¡µÚÒ»ÁĞÊı¾İ
+			/*SQLGetDataå‡½æ•°çš„åŠŸèƒ½æ˜¯æå–ç»“æœé›†ä¸­å½“å‰è®°å½•çš„æŸä¸ªå­—æ®µå€¼*/
+			SQLGetData(hstmt, 1, SQL_C_CHAR, str1, sizeof(str1), &len_str1);   //è·å–ç¬¬ä¸€åˆ—æ•°æ®
 			SQLGetData(hstmt, 2, SQL_C_CHAR, str2, sizeof(str2), &len_str2);
 			cout << str1 << "  " << str2 << endl;
 		}
@@ -263,7 +263,7 @@ void Inquire_Product() {
 	cout << endl << endl;
 }
 
-//¹Ë¿Í²éÑ¯×Ô¼ºµÄ¶©µ¥
+//é¡¾å®¢æŸ¥è¯¢è‡ªå·±çš„è®¢å•
 void Inquire_Order_Customer() {
 	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 	string str1 = "SELECT * FROM orders WHERE ctel = ";
@@ -300,9 +300,9 @@ void Inquire_Order_Customer() {
 }
 
 
-//²åÈë
+//æ’å…¥
 void Insert_Admin() {
-	//sqlÓï¾ä£ºINSERT INTO admin VALUES (103,345)
+	//sqlè¯­å¥ï¼šINSERT INTO admin VALUES (103,345)
 	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 	string str1 = "INSERT INTO admin VALUES (";
 	cout << "Please enter the administrator number and password in sequence." << endl;
@@ -326,7 +326,7 @@ void Insert_Admin() {
 }
 
 void Insert_Customer() {
-	//sqlÓï¾ä£ºINSERT INTO customer VALUES ('John','D7-209',123456,124)
+	//sqlè¯­å¥ï¼šINSERT INTO customer VALUES ('John','D7-209',123456,124)
 	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 	string str1 = "INSERT INTO customer VALUES ('";
 	cout << "Please enter your name, address, telephone number and password in sequence." << endl;
@@ -350,7 +350,7 @@ void Insert_Customer() {
 }
 
 void Insert_Order() {
-	//sqlÓï¾ä£ºINSERT INTO orders VALUES (106,'Pizza',20,12345)
+	//sqlè¯­å¥ï¼šINSERT INTO orders VALUES (106,'Pizza',20,12345)
 	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 	string str1 = "INSERT INTO orders VALUES (";
 	cout << "Please enter the order number, order name, amount and telephone number in sequence." << endl;
@@ -375,7 +375,7 @@ void Insert_Order() {
 
 void Insert_Product()
 {
-	//sqlÓï¾ä£ºINSERT INTO products VALUES ('Buger',13)
+	//sqlè¯­å¥ï¼šINSERT INTO products VALUES ('Buger',13)
 	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 	string str1 = "INSERT INTO products VALUES ('";
 	cout << "Please enter the product name and price in sequence." << endl;
@@ -398,9 +398,9 @@ void Insert_Product()
 	Action_Admin();
 }
 
-//µãµ¥
+//ç‚¹å•
 void Ordering() {
-	//sqlÓï¾ä£ºINSERT INTO orders ( oname, money, ctel ) VALUES ('Pizza',20,12345)
+	//sqlè¯­å¥ï¼šINSERT INTO orders ( oname, money, ctel ) VALUES ('Pizza',20,12345)
 	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 	string str1 = "INSERT INTO orders ( oname, money, ctel ) VALUES ('";
 	cout << "Please enter the order name, amount and telephone number in sequence." << endl;
@@ -425,9 +425,9 @@ void Ordering() {
 
 
 
-//É¾³ı
+//åˆ é™¤
 void Delete_Admin() {
-	//sqlÓï¾ä£ºDELETE FROM admin WHERE anum ='103'
+	//sqlè¯­å¥ï¼šDELETE FROM admin WHERE anum ='103'
 	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 	string str1 = "DELETE FROM admin WHERE anum ='";
 	cout << "Please enter the administrator number to delete." << endl;
@@ -452,7 +452,7 @@ void Delete_Admin() {
 
 void Delete_Customer()
 {
-	//sqlÓï¾ä£ºDELETE FROM customer WHERE ctel ='12345'
+	//sqlè¯­å¥ï¼šDELETE FROM customer WHERE ctel ='12345'
 	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 	string str1 = "DELETE FROM customer WHERE ctel ='";
 	cout << "Please enter your mobile number." << endl;
@@ -477,7 +477,7 @@ void Delete_Customer()
 
 void Delete_Order()
 {
-	//sqlÓï¾ä£ºDELETE FROM orders WHERE onum ='104'
+	//sqlè¯­å¥ï¼šDELETE FROM orders WHERE onum ='104'
 	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 	string str1 = "DELETE FROM orders WHERE onum ='";
 	cout << "Please enter the order number to delete." << endl;
@@ -502,7 +502,7 @@ void Delete_Order()
 
 void Delete_Product()
 {
-	//sqlÓï¾ä£ºDELETE FROM products WHERE pname ='²âÊÔ'
+	//sqlè¯­å¥ï¼šDELETE FROM products WHERE pname ='æµ‹è¯•'
 	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 	string str1 = "DELETE FROM products WHERE pname ='";
 	cout << "Please enter the name of the off shelf product." << endl;
@@ -526,9 +526,9 @@ void Delete_Product()
 } 
 
 
-//ĞŞ¸Ä
+//ä¿®æ”¹
 void Change_Admin() {
-	//sqlÓï¾ä£ºUPDATE admin SET acode = 12345 WHERE anum = 101
+	//sqlè¯­å¥ï¼šUPDATE admin SET acode = 12345 WHERE anum = 101
 	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 	string str1 = "UPDATE admin SET acode =";
 	cout << "Please enter your new password and administrator number." << endl;
@@ -552,7 +552,7 @@ void Change_Admin() {
 }
 
 void Change_Customer() {
-	//sqlÓï¾ä£ºUPDATE customer SET cname = 'ÀîÑô', cplace = 'D8-103', ccode = 5678 WHERE ctel = 56789
+	//sqlè¯­å¥ï¼šUPDATE customer SET cname = 'æé˜³', cplace = 'D8-103', ccode = 5678 WHERE ctel = 56789
 	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 	string str1 = "UPDATE customer SET cname = '";
 	cout << "Please enter your name, address, password and telephone number in sequence. (The telephone number cannot be modified, please register separately)" << endl;
@@ -577,7 +577,7 @@ void Change_Customer() {
 }
 
 void Change_Order() {
-	//sqlÓï¾ä£ºUPDATE orders SET oname = 'Dumplings', money = 16, ctel = 456789 WHERE onum = 102
+	//sqlè¯­å¥ï¼šUPDATE orders SET oname = 'Dumplings', money = 16, ctel = 456789 WHERE onum = 102
 	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 	string str1 = "UPDATE orders SET oname = '";
 	cout << "Please enter the order name, amount, telephone number and order number in sequence." << endl;
@@ -601,7 +601,7 @@ void Change_Order() {
 }
 
 void Change_Product() {
-	//sqlÓï¾ä£ºUPDATE products SET pprice = 14 WHERE pname = 'Dumplings'
+	//sqlè¯­å¥ï¼šUPDATE products SET pprice = 14 WHERE pname = 'Dumplings'
 	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 	string str1 = "UPDATE products SET pprice = ";
 	cout << "Please enter a new price and trade name." << endl;
@@ -626,7 +626,7 @@ void Change_Product() {
 }
 
 
-//µÇÂ¼
+//ç™»å½•
 void Action_Admin();
 void Action_Customer();
 
@@ -677,7 +677,7 @@ void CustomerLogin() {
 	free();
 }
 
-//½çÃæ
+//ç•Œé¢
 void MenuAJudge();
 void MenuCJudge();
 void Check_Admin();
