@@ -400,16 +400,30 @@ void Insert_Product()
 
 //点单
 void Ordering() {
-	//sql语句：INSERT INTO orders ( oname, money, ctel ) VALUES ('Pizza',20,12345)
+	//sql语句：INSERT INTO orders ( pid, money, ctel ) VALUES (1,18,12345)
 	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
-	string str1 = "INSERT INTO orders ( oname, money, ctel ) VALUES ('";
-	cout << "Please enter the order name, amount and telephone number in sequence." << endl;
-	string oname, money, ctel;
-	cin >> oname >> money >> ctel;
-	string str2 = str1 + oname + "'," + money + "," + ctel + ")";
-	wchar_t* wc = new wchar_t[str2.size()];
-	swprintf(wc, 100, L"%S", str2.c_str());
-	ret = SQLExecDirect(hstmt, wc, SQL_NTS);
+	cout << "Please enter the product id and telephone number in sequence." << endl;
+	string pid ,ctel;
+	cin >> pid >> ctel;
+	string sql1 = "SELECT pprice FROM products WHERE pid = ";
+	string sql2 = sql1 + pid;
+	wchar_t* wc_t = new wchar_t[sql2.size()];
+	swprintf(wc_t, 100, L"%S", sql2.c_str());
+	ret = SQLExecDirect(hstmt, wc_t, SQL_NTS);
+	SQLCHAR str[50];
+	SQLLEN len_str;
+	while (SQLFetch(hstmt) != SQL_NO_DATA)
+	{
+		SQLGetData(hstmt, 1, SQL_C_CHAR, str, sizeof(str), &len_str);
+	}
+	string money((const char*)str);
+	cout << money << endl;
+	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
+	string str1 = "INSERT INTO orders ( pid, money, ctel ) VALUES (";
+	string str2 = str1 + pid + "," + money + "," + ctel + ")";
+	wchar_t* wc1 = new wchar_t[str2.size()];
+	swprintf(wc1, 100, L"%S", str2.c_str());
+	ret = SQLExecDirect(hstmt, wc1, SQL_NTS);
 	if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO) {
 		cout << "Order successfully!" << endl;
 	}
