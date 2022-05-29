@@ -23,7 +23,7 @@ typedef struct {
 		oname[oname_length],
 		pname[pname_length];
 	SQLSMALLINT acode,cccode, money, pprice;
-	SQLINTEGER anum, ctel, onum;
+	SQLINTEGER anum, ctel, onum,quantity;
 }ORDERING;
 ORDERING ordering;
 
@@ -38,7 +38,7 @@ wchar_t* trstring2wchar(const  char* str)
 }
 
 //宽字符转换为字符串
-void wchar2strstring(string& szDst, WCHAR* wchart)
+string wchar2strstring(string& szDst, WCHAR* wchart)
 {
 	wchar_t* wtext = wchart;
 	DWORD dwNmu = WideCharToMultiByte(CP_OEMCP, NULL, wtext, -1, NULL, 0, NULL, FALSE);
@@ -47,6 +47,22 @@ void wchar2strstring(string& szDst, WCHAR* wchart)
 	WideCharToMultiByte(CP_OEMCP, NULL, wtext, -1, psTest, dwNmu, NULL, FALSE);
 	szDst = psTest;
 	delete[]psTest;
+	return szDst;
+}
+
+//
+string wChar2String(LPCWSTR pwszSrc) {
+	int nLen = WideCharToMultiByte(CP_ACP, 0, pwszSrc, -1, NULL, 0, NULL, NULL);
+	if (nLen <= 0)
+		return string("");
+	char* pszDst = new char[nLen]; 
+	if (NULL == pszDst)
+		return string("");
+	WideCharToMultiByte(CP_ACP, 0, pwszSrc, -1, pszDst, nLen, NULL, NULL); 
+	pszDst[nLen - 1] = 0;
+	string strTemp(pszDst);
+	delete[] pszDst;
+	return strTemp;
 }
 
 //字符转换为wstring
@@ -112,12 +128,13 @@ void error(SQLRETURN err) {
 }
 
 //连接
-void Link() {
+void Link()
+{
 	ret = SQLAllocHandle(SQL_HANDLE_ENV, NULL, &henv);//申请环境句柄
 	ret = SQLSetEnvAttr(henv,SQL_ATTR_ODBC_VERSION,(SQLPOINTER)SQL_OV_ODBC3,SQL_IS_INTEGER);
 	ret = SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);//申请数据库连接句柄
 
-	ret = SQLConnect(hdbc, (SQLWCHAR*)L"TEST", SQL_NTS, (SQLWCHAR*)L"UserName", SQL_NTS, (SQLWCHAR*)L"PassWord", SQL_NTS);
+	ret = SQLConnect(hdbc, (SQLWCHAR*)L"TEST", SQL_NTS, (SQLWCHAR*)L"XYL", SQL_NTS, (SQLWCHAR*)L"xuyule010913@", SQL_NTS);
 
 	if (!(ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO)) {
 		cout << "Failed to connect to database!" << endl << endl;
@@ -210,7 +227,7 @@ void Inquire_Order() {
 	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 	SQLWCHAR sql1[] = L"SELECT * FROM orders";
 	ret = SQLExecDirect(hstmt, sql1, SQL_NTS);
-	cout << "OrderNumber" << "  " << "OrderName" << "  " << "Amount" << "  " << "TelNumber" << endl << endl;
+	cout << "OrderNumber" << "  " << "ProductID" << "  " << "Amount" << "  " << "TelNumber" << endl << endl;
 	if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO)
 	{
 		SQLCHAR str1[50], str2[50], str3[50], str4[50];
@@ -240,17 +257,19 @@ void Inquire_Product() {
 	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
 	SQLWCHAR sql1[] = L"SELECT * FROM products";
 	ret = SQLExecDirect(hstmt, sql1, SQL_NTS);
-	cout << "ProductName" << "  " << "Price" << endl << endl;
+	cout << "ProductID" << "     " << "ProductName" << "     " << "Price" << "     " << "Quantity" << endl << endl;
 	if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO)
 	{
-		SQLCHAR str1[50], str2[50];
-		SQLLEN len_str1, len_str2;
+		SQLCHAR str1[50], str2[50], str3[50], str4[50];
+		SQLLEN len_str1, len_str2, len_str3, len_str4;
 
 			while (SQLFetch(hstmt) != SQL_NO_DATA)
 		{
 			SQLGetData(hstmt, 1, SQL_C_CHAR, str1, sizeof(str1), &len_str1);
 			SQLGetData(hstmt, 2, SQL_C_CHAR, str2, sizeof(str2), &len_str2);
-			cout << str1 << "   " << str2 << endl;
+			SQLGetData(hstmt, 3, SQL_C_CHAR, str3, sizeof(str3), &len_str3);
+			SQLGetData(hstmt, 4, SQL_C_CHAR, str4, sizeof(str4), &len_str4);
+			cout << str1 << "   " << str2 << "   " << str3 << "   " << str4 << endl;
 		}
 	}
 	else {
@@ -274,7 +293,7 @@ void Inquire_Order_Customer() {
 	wchar_t* wc = new wchar_t[str2.size()];
 	swprintf(wc, 100, L"%S", str2.c_str());
 	ret = SQLExecDirect(hstmt, wc, SQL_NTS);
-	cout << "OrderNumber" << "  " << "OrderName" << "  " << "Amount" << "  " << "TelNumber" << endl << endl;
+	cout << "OrderNumber" << "  " << "ProductID" << "  " << "Amount" << "  " << "TelNumber" << endl << endl;
 	if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO)
 	{
 		SQLCHAR str1[50], str2[50], str3[50], str4[50];
@@ -308,7 +327,7 @@ void Insert_Admin() {
 	cout << "Please enter the administrator number and password in sequence." << endl;
 	string anum, acode;
 	cin >> anum >> acode;
-	string str2 = str1 + anum + "'," + acode + ")";
+	string str2 = str1 + anum + "," + acode + ")";
 	wchar_t* wc = new wchar_t[str2.size()];
 	swprintf(wc, 100, L"%S", str2.c_str());
 	ret = SQLExecDirect(hstmt, wc, SQL_NTS);
@@ -346,7 +365,6 @@ void Insert_Customer() {
 	}
 	free();
 	cout << endl << endl;
-	Action_Admin();
 }
 
 void Insert_Order() {
@@ -375,13 +393,13 @@ void Insert_Order() {
 
 void Insert_Product()
 {
-	//sql语句：INSERT INTO products VALUES ('Buger',13)
+	//sql语句：INSERT INTO products VALUES (20,'Buger',13,20)
 	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
-	string str1 = "INSERT INTO products VALUES ('";
-	cout << "Please enter the product name and price in sequence." << endl;
-	string pname, pprice;
-	cin >> pname >> pprice;
-	string str2 = str1 + pname + "'," + pprice + ")";
+	string str1 = "INSERT INTO products VALUES (";
+	cout << "Please enter the product id, name, price and quantity in sequence." << endl;
+	string pid, pname, pprice, quantity;
+	cin >> pid >> pname >> pprice >> quantity;
+	string str2 = str1 + pid + ",'" + pname + "'," + pprice + "," + quantity + ")";
 	wchar_t* wc = new wchar_t[str2.size()];
 	swprintf(wc, 100, L"%S", str2.c_str());
 	ret = SQLExecDirect(hstmt, wc, SQL_NTS);
@@ -438,7 +456,6 @@ void Ordering() {
 }
 
 
-
 //删除
 void Delete_Admin() {
 	//sql语句：DELETE FROM admin WHERE anum ='103'
@@ -486,7 +503,6 @@ void Delete_Customer()
 	}
 	free();
 	cout << endl << endl;
-	Action_Admin();
 }
 
 void Delete_Order()
@@ -516,13 +532,13 @@ void Delete_Order()
 
 void Delete_Product()
 {
-	//sql语句：DELETE FROM products WHERE pname ='测试'
+	//sql语句：DELETE FROM products WHERE pid = 20
 	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
-	string str1 = "DELETE FROM products WHERE pname ='";
-	cout << "Please enter the name of the off shelf product." << endl;
+	string str1 = "DELETE FROM products WHERE pid =";
+	cout << "Please enter the id of the off shelf product." << endl;
 	string pname;
 	cin >> pname;
-	string str2 = str1 + pname + "'";
+	string str2 = str1 + pname;
 	wchar_t* wc = new wchar_t[str2.size()];
 	swprintf(wc, 100, L"%S", str2.c_str());
 	ret = SQLExecDirect(hstmt, wc, SQL_NTS);
@@ -573,7 +589,6 @@ void Change_Customer() {
 	string cname, cplace, ccode, ctel;
 	cin >> cname >> cplace >> ccode >> ctel;
 	string str2 = str1 + cname + "', cplace = '" + cplace + "', ccode =" + ccode + " WHERE ctel = " + ctel;
-	cout << str2 << endl;
 	wchar_t* wc = new wchar_t[str2.size()];
 	swprintf(wc, 100, L"%S", str2.c_str());
 	ret = SQLExecDirect(hstmt, wc, SQL_NTS);
@@ -615,14 +630,13 @@ void Change_Order() {
 }
 
 void Change_Product() {
-	//sql语句：UPDATE products SET pprice = 14 WHERE pname = 'Dumplings'
+	//sql语句：UPDATE products SET pname = 'buger', pprice = 14, quantity=20 WHERE pid = 10
 	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
-	string str1 = "UPDATE products SET pprice = ";
-	cout << "Please enter a new price and trade name." << endl;
-	string pprice,pname;
-	cin >> pprice >> pname;
-	string str2 = str1 + pprice + " WHERE pname = '" + pname + "'";
-	cout << str2 << endl;
+	string str1 = "UPDATE products SET pname = '";
+	cout << "Please enter new name, price, quantity and id." << endl;
+	string pprice, pname, quantity, pid;
+	cin >> pname >> pprice >> quantity >> pid;
+	string str2 = str1 + pname + "'," + "pprice=" + pprice + "," + "quantity=" + quantity + " WHERE pid = " + pid;
 	wchar_t* wc = new wchar_t[str2.size()];
 	swprintf(wc, 100, L"%S", str2.c_str());
 	ret = SQLExecDirect(hstmt, wc, SQL_NTS);
@@ -647,46 +661,79 @@ void Action_Customer();
 void AdminLogin() {
 	//SQL:SELECT * FROM admin WHERE anum = 101 AND acode = 123
 	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
-	string str1 = "SELECT * FROM admin WHERE anum=";
+	string str01 = "SELECT * FROM admin WHERE anum = ";
 	cout << "Please enter the administrator number and password." << endl;
 	string anum, acode;
 	cin >> anum >> acode;
-	string str2 = str1 + anum + " AND acode = " + acode;
-	wchar_t* wc = new wchar_t[str2.size()];
-	swprintf(wc, 100, L"%S", str2.c_str());
+	string str02 = str01 + anum + " AND acode = " + acode;
+	wchar_t* wc = new wchar_t[str02.size()];
+	swprintf(wc, 100, L"%S", str02.c_str());
 	ret = SQLExecDirect(hstmt, wc, SQL_NTS);
 	if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO) {
-		cout << "Login succeeded!" << endl << endl;
-		free();
-		Action_Admin();
+
+		SQLCHAR str1[50], str2[50];
+		SQLLEN len_str1, len_str2;
+		while (SQLFetch(hstmt) != SQL_NO_DATA)
+		{
+			SQLGetData(hstmt, 1, SQL_C_CHAR, str1, sizeof(str1), &len_str1);
+			SQLGetData(hstmt, 2, SQL_C_CHAR, str2, sizeof(str2), &len_str2);
+		}
+		if ((const char*)str1 == anum && (const char*)str2 == acode) {
+			cout << "Login succeeded!" << endl << endl;
+			free();
+			Action_Admin();
+		}
+		else {
+			cout << "No such person found!" << endl;
+			AdminLogin();
+		}
 	}
 	else {
 		cout << "Login failed!" << endl;
 		handleResult(hstmt, SQL_HANDLE_STMT, ret);
 		error(ret);
+		AdminLogin();
 	}
+	free();
 }
 
 void CustomerLogin() {
 	//SQL:SELECT * FROM customer WHERE ctel = 12345 AND ccode = 123
 	ret = SQLAllocHandle(SQL_HANDLE_STMT, hdbc, &hstmt);
-	string str1 = "SELECT * FROM customer WHERE ctel = ";
+	string str01 = "SELECT * FROM customer WHERE ctel = ";
 	cout << "Please enter the customer tel and password." << endl;
 	string ctel, ccode;
 	cin >> ctel >> ccode;
-	string str2 = str1 + ctel + " AND ccode = " + ccode;
-	wchar_t* wc = new wchar_t[str2.size()];
-	swprintf(wc, 100, L"%S", str2.c_str());
+	string str02 = str01 + ctel + " AND ccode = " + ccode;
+	wchar_t* wc = new wchar_t[str02.size()];
+	swprintf(wc, 100, L"%S", str02.c_str());
 	ret = SQLExecDirect(hstmt, wc, SQL_NTS);
-	if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO) {
-		cout << "Login succeeded!" << endl << endl;
-		free();
-		Action_Customer();
+	if (ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO && ret != NULL) {
+
+		SQLCHAR str1[50], str2[50], str3[50], str4[50];
+		SQLLEN len_str1, len_str2, len_str3, len_str4;
+		while (SQLFetch(hstmt) != SQL_NO_DATA)
+		{
+			SQLGetData(hstmt, 1, SQL_C_CHAR, str1, sizeof(str1), &len_str1);
+			SQLGetData(hstmt, 2, SQL_C_CHAR, str2, sizeof(str2), &len_str2);
+			SQLGetData(hstmt, 3, SQL_C_CHAR, str3, sizeof(str3), &len_str3);
+			SQLGetData(hstmt, 4, SQL_C_CHAR, str4, sizeof(str4), &len_str4);
+		}
+		if ((const char*)str3 == ctel && (const char*)str4 == ccode) {
+			cout << "Login succeeded!" << endl << endl;
+			free();
+			Action_Customer();
+		}
+		else {
+			cout << "No such person found!" << endl;
+			CustomerLogin();
+		}
 	}
 	else {
 		cout << "Login failed!" << endl;
 		handleResult(hstmt, SQL_HANDLE_STMT, ret);
 		error(ret);
+		CustomerLogin();
 	}
 	free();
 }
@@ -790,6 +837,7 @@ void Action_Customer() {
 	if (n == 1) {
 		system("cls");
 		Delete_Customer();
+		MainMenu();
 	}
 	else if (n == 2) {
 		system("cls");
@@ -854,6 +902,7 @@ void MenuCJudge() {
 	if (a == 1) {
 		system("cls");
 		Insert_Customer();
+		Action_Customer();
 	}
 	else if (a == 2) {
 		system("cls");
@@ -930,10 +979,12 @@ void Check_Customer() {
 	if (n == 1) {
 		system("cls");
 		Insert_Customer();
+		Action_Admin();
 	}
 	else if (n == 2) {
 		system("cls");
 		Delete_Customer();
+		Action_Admin();
 	}
 	else if (n == 3) {
 		system("cls");
