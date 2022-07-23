@@ -134,7 +134,7 @@ void Link()
 	ret = SQLSetEnvAttr(henv,SQL_ATTR_ODBC_VERSION,(SQLPOINTER)SQL_OV_ODBC3,SQL_IS_INTEGER);
 	ret = SQLAllocHandle(SQL_HANDLE_DBC, henv, &hdbc);//申请数据库连接句柄
 
-	ret = SQLConnect(hdbc, (SQLWCHAR*)L"TEST", SQL_NTS, (SQLWCHAR*)L"XYL", SQL_NTS, (SQLWCHAR*)L"xuyule010913@", SQL_NTS);
+	ret = SQLConnect(hdbc, (SQLWCHAR*)L"TEST", SQL_NTS, (SQLWCHAR*)L"UserName", SQL_NTS, (SQLWCHAR*)L"PassWord", SQL_NTS);
 
 	if (!(ret == SQL_SUCCESS || ret == SQL_SUCCESS_WITH_INFO)) {
 		cout << "Failed to connect to database!" << endl << endl;
